@@ -61,34 +61,7 @@ static void MX_CAN1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-CAN_TxHeaderTypeDef TxHeader;
-CAN_RxHeaderTypeDef RxHeader;
 
-uint8_t TxData[8];
-uint8_t RxData[8];
-
-uint32_t TxMailbox;
-uint32_t RxMailbox;
-int dataCheck = 0;
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	if(GPIO_Pin == GPIO_PIN_13)
-	{
-		TxData[0] = 100; //Delay 100ms Example indicates Byte 0 represents delay
-		TxData[1] = 10; // Number of times to Blink
-		HAL_CAN_AddTxMessage(&hcan1,&TxHeader, TxData, &TxMailbox);
-	}
-}
-
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
-{
-	HAL_CAN_GetRxMessage(&hcan1,CAN_RX_FIFO0,&RxHeader, RxData);
-	if(RxHeader.DLC == 2)
-	{
-		dataCheck =  1;
-	}
-}
 /* USER CODE END 0 */
 
 /**
@@ -123,14 +96,6 @@ int main(void)
   MX_ADC1_Init();
   MX_CAN1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_CAN_Start(&hcan1);
-  //Activate Notification
-  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
-
-  TxHeader.DLC = 2; // 2 data bytes
-  TxHeader.IDE = CAN_ID_STD;
-  TxHeader.RTR = CAN_RTR_DATA;
-  TxHeader.StdId = 0x446; //Sender ID (this 446 device)
 
   /* USER CODE END 2 */
 
@@ -289,20 +254,7 @@ static void MX_CAN1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN CAN1_Init 2 */
-  CAN_FilterTypeDef canFilterConfig;
 
-  canFilterConfig.FilterActivation = CAN_FILTER_ENABLE;
-  canFilterConfig.FilterBank = 18;
-  canFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-  canFilterConfig.FilterIdHigh = 0x103<<5; //32-bit ID/mask.  Shift 5 to place in correct location (Get past Exid 13-17).
-  canFilterConfig.FilterIdLow = 0;
-  canFilterConfig.FilterMaskIdHigh = 0x103<<5;//32-bit ID/mask.  Shift 5 to place in correct location (Get past Exid 13-17).
-  canFilterConfig.FilterMaskIdLow = 0x0000; //This is possibly wrong.
-  canFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-  canFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-  canFilterConfig.SlaveStartFilterBank = 20;
-
-  HAL_CAN_ConfigFilter(&hcan1, &canFilterConfig);
   /* USER CODE END CAN1_Init 2 */
 
 }

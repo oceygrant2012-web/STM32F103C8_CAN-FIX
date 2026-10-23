@@ -1,7 +1,6 @@
-C:/Users/oceyg/Documents/CAN_Projects/F103C8_CAN/Core/Src/main.c:67:6:HAL_CAN_RxFifo1MsgPendingCallback	2
-C:/Users/oceyg/Documents/CAN_Projects/F103C8_CAN/Core/Src/main.c:86:5:main	1
-C:/Users/oceyg/Documents/CAN_Projects/F103C8_CAN/Core/Src/main.c:145:6:SystemClock_Config	4
-C:/Users/oceyg/Documents/CAN_Projects/F103C8_CAN/Core/Src/main.c:192:13:MX_ADC1_Init	3
-C:/Users/oceyg/Documents/CAN_Projects/F103C8_CAN/Core/Src/main.c:239:13:MX_CAN_Init	2
-C:/Users/oceyg/Documents/CAN_Projects/F103C8_CAN/Core/Src/main.c:289:13:MX_GPIO_Init	1
-C:/Users/oceyg/Documents/CAN_Projects/F103C8_CAN/Core/Src/main.c:324:6:Error_Handler	1
+C:/git/STM32F103C8_CAN-FIX/F103C8_CAN/Core/Src/main.c:69:5:main	1
+C:/git/STM32F103C8_CAN-FIX/F103C8_CAN/Core/Src/main.c:115:6:SystemClock_Config	4
+C:/git/STM32F103C8_CAN-FIX/F103C8_CAN/Core/Src/main.c:162:13:MX_ADC1_Init	3
+C:/git/STM32F103C8_CAN-FIX/F103C8_CAN/Core/Src/main.c:209:13:MX_CAN_Init	2
+C:/git/STM32F103C8_CAN-FIX/F103C8_CAN/Core/Src/main.c:246:13:MX_GPIO_Init	1
+C:/git/STM32F103C8_CAN-FIX/F103C8_CAN/Core/Src/main.c:281:6:Error_Handler	1

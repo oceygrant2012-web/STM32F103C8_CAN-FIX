@@ -1,2 +1,2 @@
-C:/Users/oceyg/Documents/CAN_Projects/F446_CAN/Src/system_stm32f4xx.c:167:6:SystemInit	1
-C:/Users/oceyg/Documents/CAN_Projects/F446_CAN/Src/system_stm32f4xx.c:220:6:SystemCoreClockUpdate	6
+C:/git/STM32F103C8_CAN-FIX/F446_CAN/Core/Src/system_stm32f4xx.c:167:6:SystemInit	1
+C:/git/STM32F103C8_CAN-FIX/F446_CAN/Core/Src/system_stm32f4xx.c:220:6:SystemCoreClockUpdate	6

@@ -54,24 +54,7 @@ static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_CAN_Init(void);
 /* USER CODE BEGIN PFP */
-CAN_TxHeaderTypeDef TxHeader;
-CAN_RxHeaderTypeDef RxHeader;
 
-uint8_t TxData[8];
-uint8_t RxData[8];
-
-uint32_t TxMailbox;
-uint32_t RxMailbox;
-int dataCheck = 0;
-
-void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
-{
-	HAL_CAN_GetRxMessage(hcan,CAN_RX_FIFO1,&RxHeader, RxData);
-	if(RxHeader.DLC == 2)
-	{
-		dataCheck =  1;
-	}
-}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -112,26 +95,12 @@ int main(void)
   MX_CAN_Init();
   /* USER CODE BEGIN 2 */
 
-  HAL_CAN_Start(&hcan);
-  //Activate Notification
-  HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO1_MSG_PENDING);
-
-  TxHeader.DLC = 2; // 2 data bytes
-  TxHeader.IDE = CAN_ID_STD;
-  TxHeader.RTR = CAN_RTR_DATA;
-  TxHeader.StdId = 0x103; //Sender ID (this 103 device)
-  TxHeader.TransmitGlobalTime = DISABLED; //Disable sending time-stamp
-
-	TxData[0] = 50; //Delay 100ms Example indicates Byte 0 represents delay
-	TxData[1] = 20; // Number of times to Blink
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -248,10 +217,10 @@ static void MX_CAN_Init(void)
 
   /* USER CODE END CAN_Init 1 */
   hcan.Instance = CAN1;
-  hcan.Init.Prescaler = 18;
+  hcan.Init.Prescaler = 16;
   hcan.Init.Mode = CAN_MODE_NORMAL;
   hcan.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan.Init.TimeSeg1 = CAN_BS1_2TQ;
+  hcan.Init.TimeSeg1 = CAN_BS1_1TQ;
   hcan.Init.TimeSeg2 = CAN_BS2_1TQ;
   hcan.Init.TimeTriggeredMode = DISABLE;
   hcan.Init.AutoBusOff = DISABLE;
@@ -264,20 +233,7 @@ static void MX_CAN_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN CAN_Init 2 */
-  CAN_FilterTypeDef canFilterConfig;
 
-  canFilterConfig.FilterActivation = CAN_FILTER_ENABLE;
-  canFilterConfig.FilterBank = 10; // 0.. 13
-  canFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO1;
-  canFilterConfig.FilterIdHigh = 0x446; //I am unable to see how many bits this is shifted over.  It is the ID of the board sending data to this...
-  canFilterConfig.FilterIdLow = 0;
-  canFilterConfig.FilterMaskIdHigh = 0x446;//I am unable to see how many bits this is shifted over.  It is the ID of the board sending data to this...
-  canFilterConfig.FilterMaskIdLow = 0x0000; //This is possibly wrong.
-  canFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-  canFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-  canFilterConfig.SlaveStartFilterBank = 0; //Doesn't matter with uProc with only one CAN
-
-  HAL_CAN_ConfigFilter(&hcan, &canFilterConfig);
   /* USER CODE END CAN_Init 2 */
 
 }

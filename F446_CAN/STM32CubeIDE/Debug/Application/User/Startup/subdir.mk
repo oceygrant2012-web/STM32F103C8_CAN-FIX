@@ -5,23 +5,23 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 S_SRCS += \
-../Application/Startup/startup_stm32f446retx.s 
+../Application/User/Startup/startup_stm32f446retx.s 
 
 OBJS += \
-./Application/Startup/startup_stm32f446retx.o 
+./Application/User/Startup/startup_stm32f446retx.o 
 
 S_DEPS += \
-./Application/Startup/startup_stm32f446retx.d 
+./Application/User/Startup/startup_stm32f446retx.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
-Application/Startup/%.o: ../Application/Startup/%.s Application/Startup/subdir.mk
+Application/User/Startup/%.o: ../Application/User/Startup/%.s Application/User/Startup/subdir.mk
 	arm-none-eabi-gcc -mcpu=cortex-m4 -g3 -DDEBUG -c -x assembler-with-cpp -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@" "$<"
 
-clean: clean-Application-2f-Startup
+clean: clean-Application-2f-User-2f-Startup
 
-clean-Application-2f-Startup:
-	-$(RM) ./Application/Startup/startup_stm32f446retx.d ./Application/Startup/startup_stm32f446retx.o
+clean-Application-2f-User-2f-Startup:
+	-$(RM) ./Application/User/Startup/startup_stm32f446retx.d ./Application/User/Startup/startup_stm32f446retx.o
 
-.PHONY: clean-Application-2f-Startup
+.PHONY: clean-Application-2f-User-2f-Startup
 

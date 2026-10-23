@@ -22,8 +22,8 @@ C_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
-Application/Startup \
-Application/User \
+Application/User/Core \
+Application/User/Startup \
 Drivers/BSP/STM32F4xx_Nucleo \
 Drivers/CMSIS \
 Drivers/STM32F4xx_HAL_Driver \
