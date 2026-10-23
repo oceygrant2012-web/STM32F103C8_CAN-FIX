@@ -134,7 +134,18 @@ int main(void)
   {
 
     /* USER CODE END WHILE */
+	  if(dataCheck == 1)
+	  {
+		  for(int i = 0; i < RxData[1]; i++)
+		  {
+			  //BSP_LED_Toggle(LED2);
+			  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+			  HAL_Delay(RxData[0]);
+		  }
+		  dataCheck = 0;
+	  }
 
+	  HAL_CAN_AddTxMessage(&hcan,&TxHeader, TxData, &TxMailbox);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

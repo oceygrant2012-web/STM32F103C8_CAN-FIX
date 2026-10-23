@@ -62,11 +62,11 @@ static void MX_CAN1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 CAN_TxHeaderTypeDef TxHeader;
+uint8_t RxData[8];
+
 CAN_RxHeaderTypeDef RxHeader;
 
 uint8_t TxData[8];
-uint8_t RxData[8];
-
 uint32_t TxMailbox;
 uint32_t RxMailbox;
 int dataCheck = 0;
@@ -146,7 +146,16 @@ int main(void)
   {
 
     /* USER CODE END WHILE */
-
+	  if(dataCheck == 1)
+	  {
+		  for(int i = 0; i < RxData[1]; i++)
+		  {
+			  BSP_LED_Toggle(LED2);
+			  //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+			  HAL_Delay(RxData[0]);
+		  }
+		  dataCheck = 0;
+	  }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
