@@ -17,7 +17,9 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <CanFixHw.h>
 #include "main.h"
+#include "CanFix.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -44,8 +46,6 @@
 
 ADC_HandleTypeDef hadc1;
 
-CAN_HandleTypeDef hcan1;
-
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -54,41 +54,13 @@ CAN_HandleTypeDef hcan1;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
-static void MX_CAN1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-CAN_TxHeaderTypeDef TxHeader;
-uint8_t RxData[8];
 
-CAN_RxHeaderTypeDef RxHeader;
-
-uint8_t TxData[8];
-uint32_t TxMailbox;
-uint32_t RxMailbox;
-int dataCheck = 0;
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	if(GPIO_Pin == GPIO_PIN_13)
-	{
-		TxData[0] = 100; //Delay 100ms Example indicates Byte 0 represents delay
-		TxData[1] = 10; // Number of times to Blink
-		HAL_CAN_AddTxMessage(&hcan1,&TxHeader, TxData, &TxMailbox);
-	}
-}
-
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
-{
-	HAL_CAN_GetRxMessage(&hcan1,CAN_RX_FIFO0,&RxHeader, RxData);
-	if(RxHeader.DLC == 2)
-	{
-		dataCheck =  1;
-	}
-}
 /* USER CODE END 0 */
 
 /**
@@ -121,16 +93,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC1_Init();
-  MX_CAN1_Init();
-  /* USER CODE BEGIN 2 */
-  HAL_CAN_Start(&hcan1);
-  //Activate Notification
-  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
-
-  TxHeader.DLC = 2; // 2 data bytes
-  TxHeader.IDE = CAN_ID_STD;
-  TxHeader.RTR = CAN_RTR_DATA;
-  TxHeader.StdId = 0x446; //Sender ID (this 446 device)
+  CanFixHw_Initialize();
 
   /* USER CODE END 2 */
 
@@ -146,16 +109,7 @@ int main(void)
   {
 
     /* USER CODE END WHILE */
-	  if(dataCheck == 1)
-	  {
-		  for(int i = 0; i < RxData[1]; i++)
-		  {
-			  BSP_LED_Toggle(LED2);
-			  //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-			  HAL_Delay(RxData[0]);
-		  }
-		  dataCheck = 0;
-	  }
+	  CanFixHw_PeriodicCheck();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -266,55 +220,7 @@ static void MX_ADC1_Init(void)
 
 }
 
-/**
-  * @brief CAN1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_CAN1_Init(void)
-{
 
-  /* USER CODE BEGIN CAN1_Init 0 */
-
-  /* USER CODE END CAN1_Init 0 */
-
-  /* USER CODE BEGIN CAN1_Init 1 */
-
-  /* USER CODE END CAN1_Init 1 */
-  hcan1.Instance = CAN1;
-  hcan1.Init.Prescaler = 18;
-  hcan1.Init.Mode = CAN_MODE_NORMAL;
-  hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan1.Init.TimeSeg1 = CAN_BS1_2TQ;
-  hcan1.Init.TimeSeg2 = CAN_BS2_2TQ;
-  hcan1.Init.TimeTriggeredMode = DISABLE;
-  hcan1.Init.AutoBusOff = DISABLE;
-  hcan1.Init.AutoWakeUp = DISABLE;
-  hcan1.Init.AutoRetransmission = DISABLE;
-  hcan1.Init.ReceiveFifoLocked = DISABLE;
-  hcan1.Init.TransmitFifoPriority = DISABLE;
-  if (HAL_CAN_Init(&hcan1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN CAN1_Init 2 */
-  CAN_FilterTypeDef canFilterConfig;
-
-  canFilterConfig.FilterActivation = CAN_FILTER_ENABLE;
-  canFilterConfig.FilterBank = 18;
-  canFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-  canFilterConfig.FilterIdHigh = 0x103<<5; //32-bit ID/mask.  Shift 5 to place in correct location (Get past Exid 13-17).
-  canFilterConfig.FilterIdLow = 0;
-  canFilterConfig.FilterMaskIdHigh = 0x103<<5;//32-bit ID/mask.  Shift 5 to place in correct location (Get past Exid 13-17).
-  canFilterConfig.FilterMaskIdLow = 0x0000; //This is possibly wrong.
-  canFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-  canFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-  canFilterConfig.SlaveStartFilterBank = 20;
-
-  HAL_CAN_ConfigFilter(&hcan1, &canFilterConfig);
-  /* USER CODE END CAN1_Init 2 */
-
-}
 
 /**
   * @brief GPIO Initialization Function
