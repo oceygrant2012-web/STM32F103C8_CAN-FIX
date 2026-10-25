@@ -6,8 +6,7 @@
  */
 
 #include <CanFixHw.h>
-#include "stm32f4xx_hal.h"
-#include "stm32f4xx_nucleo.h"
+#include "stm32f1xx_hal.h"
 
 //Implementation in Main.c
 void Error_Handler();
@@ -125,8 +124,8 @@ void CanFixHw_PeriodicCheck(void)
 	  {
 		  for(int i = 0; i < RxData[1]; i++)
 		  {
-			  BSP_LED_Toggle(LED2);
-			  //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+			  //BSP_LED_Toggle(LED2);
+			  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 			  HAL_Delay(RxData[0]);
 		  }
 		  dataCheck = 0;

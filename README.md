@@ -6,7 +6,7 @@ CAN-FIX implementation on an STM32F103C8 "Blue Pill"
 
 Hardware Requirements:
 
-STLInk-V2 (ST-Link V2 Emulator Downloader Programmer)
+STLInk-V2 (ST-Link V2 Emulator Downloader Programmer) - Get a real one.  There are vendors out there selling fake ones that do not work.
 
 5V Power Supply (Temporarily may use STLink-V2 Power)
 
@@ -21,10 +21,4 @@ Software Requirements:
 STMCubeIDE
 
 STMCubeMx
-
-
-
-
-
-
 

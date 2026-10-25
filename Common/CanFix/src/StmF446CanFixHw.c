@@ -6,7 +6,9 @@
  */
 
 #include <CanFixHw.h>
-#include "stm32f1xx_hal.h"
+#include <CanFix.h>
+#include "stm32f4xx_hal.h"
+#include "stm32f4xx_nucleo.h"
 
 //Implementation in Main.c
 void Error_Handler();
@@ -16,14 +18,15 @@ void Error_Handler();
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+CAN_HandleTypeDef hcan1;
 
-CAN_HandleTypeDef hcan;
 CAN_TxHeaderTypeDef TxHeader;
-CAN_RxHeaderTypeDef RxHeader;
-
-uint8_t TxData[8];
 uint8_t RxData[8];
 
+CAN_RxHeaderTypeDef RxHeader;
+CAN_FIX_RxHeaderTypeDef CanFixRxHeader;
+
+uint8_t TxData[8];
 uint32_t TxMailbox;
 uint32_t RxMailbox;
 int dataCheck = 0;
@@ -66,9 +69,29 @@ static void StmCanFixHw_Init(void)
 
 }
 
-void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
+void CanFixHw_SendMessage(CAN_FIX_TxHeaderTypeDef* txHeader, uint8_t* txData)
 {
-	HAL_CAN_GetRxMessage(hcan,CAN_RX_FIFO1,&RxHeader, RxData);
+
+	TxData[0] = 100; //Delay 100ms Example indicates Byte 0 represents delay
+	TxData[1] = 10; // Number of times to Blink
+	HAL_CAN_AddTxMessage(&hcan1,&TxHeader, TxData, &TxMailbox);
+
+}
+
+
+
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
+{
+	HAL_CAN_GetRxMessage(&hcan1,CAN_RX_FIFO0,&RxHeader, RxData);
+	CanFixRxHeader.DLC = RxHeader.DLC;
+	CanFixRxHeader.ExtId = RxHeader.ExtId;
+	CanFixRxHeader.FilterMatchIndex = RxHeader.ExtId;
+	CanFixRxHeader.IDE = RxHeader.IDE;
+	CanFixRxHeader.RTR = RxHeader.RTR;
+	CanFixRxHeader.StdId = RxHeader.StdId;
+	CanFixRxHeader.Timestamp = RxHeader.Timestamp;
+
+	CAN_FIX_HandleCanRxMessage(&CanFixRxHeader, RxData);
 	if(RxHeader.DLC == 2)
 	{
 		dataCheck =  1;
@@ -79,39 +102,33 @@ void CanFixHw_SetHardwareMask(uint16_t mask)
 {
 	  CAN_FilterTypeDef canFilterConfig;
 
-	  canFilterConfig.FilterActivation = CAN_FILTER_ENABLE; //Enable or disable the filters
-	  canFilterConfig.FilterBank = 10; // 0.. SlaveStartFilterBank per Spec Sheet where device only has 1 CAN element
-	  canFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO1;
-	  canFilterConfig.FilterIdHigh = 0x446<<5; //32-bit ID/mask.  Shift 5 to place in correct location (Get past Exid 13-17).
+	  canFilterConfig.FilterActivation = CAN_FILTER_ENABLE;
+	  canFilterConfig.FilterBank = 18;
+	  canFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;
+	  canFilterConfig.FilterIdHigh = 0x103<<5; //32-bit ID/mask.  Shift 5 to place in correct location (Get past Exid 13-17).
 	  canFilterConfig.FilterIdLow = 0;
-	  canFilterConfig.FilterMaskIdHigh = 0x446<<5;//32-bit ID/mask.  Shift 5 to place in correct location (Get past Exid 13-17).
+	  canFilterConfig.FilterMaskIdHigh = 0x103<<5;//32-bit ID/mask.  Shift 5 to place in correct location (Get past Exid 13-17).
 	  canFilterConfig.FilterMaskIdLow = 0x0000; //This is possibly wrong.
 	  canFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
 	  canFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-	  canFilterConfig.SlaveStartFilterBank = 13; //Doesn't matter with uProc with only one CAN (1 CAN 0..13, 2 CAN 0..27)
+	  canFilterConfig.SlaveStartFilterBank = 20;
 
-	  HAL_CAN_ConfigFilter(&hcan, &canFilterConfig);
+	  HAL_CAN_ConfigFilter(&hcan1, &canFilterConfig);
 }
 
 
 void CanFixHw_Initialize()
 {
-	  MX_CAN_Init();
+	StmCanFixHw_Init();
 	  /* USER CODE BEGIN 2 */
-
-	  HAL_CAN_Start(&hcan);
+	  HAL_CAN_Start(&hcan1);
 	  //Activate Notification
-	  HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO1_MSG_PENDING);
+	  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 
 	  TxHeader.DLC = 2; // 2 data bytes
-	  TxHeader.IDE = CAN_ID_STD; //Standard length ID (11 Bit) vs Extended length ID (29 Bit)
+	  TxHeader.IDE = CAN_ID_STD;
 	  TxHeader.RTR = CAN_RTR_DATA;
-	  TxHeader.StdId = 0x103; //Sender ID (this 103 device) Min_Data = 0 and Max_Data = 0x7FF
-	  //TxHeader.ExtId = 0; //Min_Data = 0 and Max_Data = 0x1FFFFFFF
-	  TxHeader.TransmitGlobalTime = DISABLE; //Disable sending time-stamp
-
-		TxData[0] = 50; //Delay 100ms Example indicates Byte 0 represents delay
-		TxData[1] = 20; // Number of times to Blink
+	  TxHeader.StdId = 0x446; //Sender ID (this 446 device)
 }
 
 void CanFixHw_PeriodicCheck(void)
@@ -120,14 +137,12 @@ void CanFixHw_PeriodicCheck(void)
 	  {
 		  for(int i = 0; i < RxData[1]; i++)
 		  {
-			  //BSP_LED_Toggle(LED2);
-			  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+			  BSP_LED_Toggle(LED2);
+			  //HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
 			  HAL_Delay(RxData[0]);
 		  }
 		  dataCheck = 0;
 	  }
-
-	  HAL_CAN_AddTxMessage(&hcan,&TxHeader, TxData, &TxMailbox);
 }
 
 void CanFixHw_ConfigureFilter(void)

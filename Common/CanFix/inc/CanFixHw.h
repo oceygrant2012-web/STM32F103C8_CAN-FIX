@@ -8,8 +8,11 @@
 
 #ifndef APPLICATION_USER_CORE_CANFIXHW_H_
 #define APPLICATION_USER_CORE_CANFIXHW_H_
-#include "stm32f4xx_hal.h"
+#include <CanFix.h>
+//This was included to get the definitions of basic data types only
+#include "main.h"
 
+void CanFixHw_SendMessage(CAN_FIX_TxHeaderTypeDef* txHeader, uint8_t* txData);
 void CanFixHw_Initialize(void);
 void CanFixHw_SetHardwareMask(uint16_t mask);
 void CanFixHw_ConfigureFilter(void);

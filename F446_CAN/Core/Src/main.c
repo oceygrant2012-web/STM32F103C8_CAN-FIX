@@ -17,7 +17,6 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include <CanFixHw.h>
 #include "main.h"
 #include "CanFix.h"
 
@@ -60,6 +59,13 @@ static void MX_ADC1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if(GPIO_Pin == GPIO_PIN_13)
+	{
+		CAN_FIX_SendAlarm();
+	}
+}
 
 /* USER CODE END 0 */
 
@@ -93,7 +99,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC1_Init();
-  CanFixHw_Initialize();
+  CAN_FIX_Initialize();
 
   /* USER CODE END 2 */
 
@@ -109,7 +115,7 @@ int main(void)
   {
 
     /* USER CODE END WHILE */
-	  CanFixHw_PeriodicCheck();
+	  CAN_FIX_PeriodicCheck();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
