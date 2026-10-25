@@ -69,5 +69,56 @@ void CAN_FIX_Initialize(void);
 void CAN_FIX_PeriodicCheck(void);
 //TODO:  This will need to have correct parameters
 void CAN_FIX_SendAlarm();
+//Send the type of data to CAN
+//void CAN_FIX_SendHighPriortyNodeAlarm();
+//void CAN_FIX_SendNodeSpecificMessage();
+//void CAN_FIX_SendTwoWayCommunication(uint8_t channel, int8_t sender, uint8_t* data);
+
+
+//Handle Incoming data.  Override the function that is neccessary for the specific need
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleHighPriorityNodeAlarm(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
+
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleHighPriorityPilotControlInput(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
+
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleHighPriorityMeasuredPosition(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
+
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleHighPriorityFlightData(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
+
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleHighPriorityNavigationData(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
+
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleHighPriorityEngineAircraftData(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
+
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleHighPriorityAuxiliaryData(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
+
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleNormalPriorityPilotControlInput(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
+
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleNormalPriorityMeasuredPosition(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
+
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleNormalPriorityFlightData(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
+
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleNormalPriorityNavigationData(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
+
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleNormalPriorityEngineAircraftData(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
+
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleNormalPriorityAuxiliaryData(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
+
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleTwoWayConnectionChannelData(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
+
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleNodeSpecificMessage(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
 
 #endif /* APPLICATION_USER_CORE_CANFIX_H_ */

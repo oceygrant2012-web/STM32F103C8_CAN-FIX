@@ -45,8 +45,6 @@
 
 ADC_HandleTypeDef hadc1;
 
-CAN_HandleTypeDef hcan1;
-
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -55,13 +53,19 @@ CAN_HandleTypeDef hcan1;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
-static void MX_CAN1_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if(GPIO_Pin == GPIO_PIN_13)
+	{
+		CAN_FIX_SendAlarm();
+	}
+}
 
 /* USER CODE END 0 */
 
@@ -95,8 +99,8 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC1_Init();
-  /* USER CODE BEGIN 2 */
-CAN_FIX_Initialize();
+  CAN_FIX_Initialize();
+
   /* USER CODE END 2 */
 
   /* Initialize leds */
@@ -111,7 +115,7 @@ CAN_FIX_Initialize();
   {
 
     /* USER CODE END WHILE */
-
+	  CAN_FIX_PeriodicCheck();
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -221,6 +225,8 @@ static void MX_ADC1_Init(void)
   /* USER CODE END ADC1_Init 2 */
 
 }
+
+
 
 /**
   * @brief GPIO Initialization Function
