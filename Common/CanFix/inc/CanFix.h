@@ -65,12 +65,12 @@ typedef struct
 //Create the Hardware Mask.
 //Standard CAN ID is 11-bits
 void CAN_FIX_HandleCanRxMessage(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData);
-void CAN_FIX_Initialize(void);
+void CAN_FIX_Initialize(uint32_t canId);
 void CAN_FIX_PeriodicCheck(void);
 //TODO:  This will need to have correct parameters
-void CAN_FIX_SendAlarm();
+
 //Send the type of data to CAN
-//void CAN_FIX_SendHighPriortyNodeAlarm();
+void CAN_FIX_SendHighPriortyNodeAlarm(uint8_t alarm, uint8_t* alarmData, uint8_t alarmLength);
 //void CAN_FIX_SendNodeSpecificMessage();
 //void CAN_FIX_SendTwoWayCommunication(uint8_t channel, int8_t sender, uint8_t* data);
 

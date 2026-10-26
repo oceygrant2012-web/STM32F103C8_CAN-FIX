@@ -7,6 +7,7 @@
 
 #include <CanFixHw.h>
 #include "stm32f1xx_hal.h"
+#include "string.h"
 
 //Implementation in Main.c
 void Error_Handler();
@@ -16,10 +17,10 @@ void Error_Handler();
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-CAN_HandleTypeDef hcan1;
-
 CAN_TxHeaderTypeDef TxHeader;
 uint8_t RxData[8];
+
+CAN_HandleTypeDef hcan1;
 
 CAN_RxHeaderTypeDef RxHeader;
 
@@ -27,54 +28,6 @@ uint8_t TxData[8];
 uint32_t TxMailbox;
 uint32_t RxMailbox;
 int dataCheck = 0;
-
-/**
-  * @brief CAN1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void StmCanFixHw_Init(void)
-{
-
-  /* USER CODE BEGIN CAN1_Init 0 */
-
-  /* USER CODE END CAN1_Init 0 */
-
-  /* USER CODE BEGIN CAN1_Init 1 */
-
-  /* USER CODE END CAN1_Init 1 */
-  hcan1.Instance = CAN1;
-  hcan1.Init.Prescaler = 18;
-  hcan1.Init.Mode = CAN_MODE_NORMAL;
-  hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan1.Init.TimeSeg1 = CAN_BS1_2TQ;
-  hcan1.Init.TimeSeg2 = CAN_BS2_2TQ;
-  hcan1.Init.TimeTriggeredMode = DISABLE;
-  hcan1.Init.AutoBusOff = DISABLE;
-  hcan1.Init.AutoWakeUp = DISABLE;
-  hcan1.Init.AutoRetransmission = DISABLE;
-  hcan1.Init.ReceiveFifoLocked = DISABLE;
-  hcan1.Init.TransmitFifoPriority = DISABLE;
-  if (HAL_CAN_Init(&hcan1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN CAN1_Init 2 */
-  CanFixHw_ConfigureFilter();
-
-  /* USER CODE END CAN1_Init 2 */
-
-}
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	if(GPIO_Pin == GPIO_PIN_13)
-	{
-		TxData[0] = 100; //Delay 100ms Example indicates Byte 0 represents delay
-		TxData[1] = 10; // Number of times to Blink
-		HAL_CAN_AddTxMessage(&hcan1,&TxHeader, TxData, &TxMailbox);
-	}
-}
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
@@ -92,9 +45,9 @@ void CanFixHw_SetHardwareMask(uint16_t mask)
 	  canFilterConfig.FilterActivation = CAN_FILTER_ENABLE;
 	  canFilterConfig.FilterBank = 18;
 	  canFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-	  canFilterConfig.FilterIdHigh = 0x103<<5; //32-bit ID/mask.  Shift 5 to place in correct location (Get past Exid 13-17).
+	  canFilterConfig.FilterIdHigh = mask<<5; //32-bit ID/mask.  Shift 5 to place in correct location (Get past Exid 13-17).
 	  canFilterConfig.FilterIdLow = 0;
-	  canFilterConfig.FilterMaskIdHigh = 0x103<<5;//32-bit ID/mask.  Shift 5 to place in correct location (Get past Exid 13-17).
+	  canFilterConfig.FilterMaskIdHigh = mask<<5;//32-bit ID/mask.  Shift 5 to place in correct location (Get past Exid 13-17).
 	  canFilterConfig.FilterMaskIdLow = 0x0000; //This is possibly wrong.
 	  canFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
 	  canFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
@@ -103,10 +56,47 @@ void CanFixHw_SetHardwareMask(uint16_t mask)
 	  HAL_CAN_ConfigFilter(&hcan1, &canFilterConfig);
 }
 
-
-void CanFixHw_Initialize()
+void CanFixHw_SendMessage(CAN_FIX_TxHeaderTypeDef* header, uint8_t* txData)
 {
-	StmCanFixHw_Init();
+	TxHeader.DLC = header->DLC;
+	TxHeader.ExtId = header->ExtId;
+	TxHeader.IDE = header->IDE;
+	TxHeader.RTR = header->RTR;
+	TxHeader.StdId = header->StdId;
+	TxHeader.TransmitGlobalTime = header->TransmitGlobalTime;
+	memcpy(TxData,txData,TxHeader.DLC);
+	HAL_CAN_AddTxMessage(&hcan1,&TxHeader, TxData, &TxMailbox);
+}
+
+void CanFixHw_Initialize(uint32_t canId)
+{
+	  /* USER CODE BEGIN CAN1_Init 0 */
+
+	  /* USER CODE END CAN1_Init 0 */
+
+	  /* USER CODE BEGIN CAN1_Init 1 */
+
+	  /* USER CODE END CAN1_Init 1 */
+	  hcan1.Instance = CAN1;
+	  hcan1.Init.Prescaler = 18;
+	  hcan1.Init.Mode = CAN_MODE_NORMAL;
+	  hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
+	  hcan1.Init.TimeSeg1 = CAN_BS1_2TQ;
+	  hcan1.Init.TimeSeg2 = CAN_BS2_2TQ;
+	  hcan1.Init.TimeTriggeredMode = DISABLE;
+	  hcan1.Init.AutoBusOff = DISABLE;
+	  hcan1.Init.AutoWakeUp = DISABLE;
+	  hcan1.Init.AutoRetransmission = DISABLE;
+	  hcan1.Init.ReceiveFifoLocked = DISABLE;
+	  hcan1.Init.TransmitFifoPriority = DISABLE;
+	  if (HAL_CAN_Init(&hcan1) != HAL_OK)
+	  {
+	    Error_Handler();
+	  }
+	  /* USER CODE BEGIN CAN1_Init 2 */
+	  CanFixHw_SetHardwareMask(0x0000);
+
+	  /* USER CODE END CAN1_Init 2 */
 	  /* USER CODE BEGIN 2 */
 	  HAL_CAN_Start(&hcan1);
 	  //Activate Notification
@@ -115,7 +105,7 @@ void CanFixHw_Initialize()
 	  TxHeader.DLC = 2; // 2 data bytes
 	  TxHeader.IDE = CAN_ID_STD;
 	  TxHeader.RTR = CAN_RTR_DATA;
-	  TxHeader.StdId = 0x446; //Sender ID (this 446 device)
+	  TxHeader.StdId = canId; //Sender ID (this 446 device)
 }
 
 void CanFixHw_PeriodicCheck(void)
@@ -130,9 +120,4 @@ void CanFixHw_PeriodicCheck(void)
 		  }
 		  dataCheck = 0;
 	  }
-}
-
-void CanFixHw_ConfigureFilter(void)
-{
-	CanFixHw_SetHardwareMask(0x0103);
 }

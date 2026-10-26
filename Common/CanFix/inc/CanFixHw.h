@@ -13,9 +13,8 @@
 #include "main.h"
 
 void CanFixHw_SendMessage(CAN_FIX_TxHeaderTypeDef* txHeader, uint8_t* txData);
-void CanFixHw_Initialize(void);
+void CanFixHw_Initialize(uint32_t canId);
 void CanFixHw_SetHardwareMask(uint16_t mask);
-void CanFixHw_ConfigureFilter(void);
 void CanFixHw_PeriodicCheck(void);
 
 #endif /* APPLICATION_USER_CORE_CANFIXHW_H_ */

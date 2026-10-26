@@ -53,8 +53,27 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_ADC1_Init(void);
 /* USER CODE BEGIN PFP */
+/* USER CODE BEGIN 0 */
+uint8_t alarmData[8];
+uint8_t alarmTriggered = 0;
+/* USER CODE BEGIN PFP */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if(GPIO_Pin == GPIO_PIN_13)
+	{
+		alarmData[0] = 10;
+		alarmData[1] = 20;
+		CAN_FIX_SendHighPriortyNodeAlarm(1,alarmData, 2);
+	}
+}
 
-
+/* Define the default function with __weak attribute */
+void CAN_FIX_HandleHighPriorityNodeAlarm(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData)
+{
+    alarmData[0] = rxData[0];
+    alarmData[1] = rxData[0];
+    alarmTriggered = 1;
+}
 
 /* USER CODE END PFP */
 
@@ -94,7 +113,7 @@ int main(void)
   MX_GPIO_Init();
   MX_ADC1_Init();
 
-  CAN_FIX_Initialize();
+  CAN_FIX_Initialize(0x103);
 
 
   /* USER CODE END 2 */
@@ -103,7 +122,16 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
+	  if(alarmTriggered == 1)
+	  {
+		  for(int i = 0; i < alarmData[1]; i++)
+		  {
+			  HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+			  //BSP_LED_Toggle(LED2);
+			  HAL_Delay(alarmData[0]);
+		  }
+		  alarmTriggered = 0;
+	  }
     /* USER CODE END WHILE */
 	  CAN_FIX_PeriodicCheck();
     /* USER CODE BEGIN 3 */
