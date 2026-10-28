@@ -65,8 +65,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin == GPIO_PIN_13)
 	{
-		alarmData[0] = 10;
+		alarmData[0] = 244;
 		alarmData[1] = 20;
+		//alarmTriggered = 1;
 		CAN_FIX_SendHighPriortyNodeAlarm(1,alarmData, 2);
 	}
 }
@@ -75,7 +76,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 void CAN_FIX_HandleHighPriorityNodeAlarm(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData)
 {
     alarmData[0] = rxData[0];
-    alarmData[1] = rxData[0];
+    alarmData[1] = rxData[1];
     alarmTriggered = 1;
 }
 /* USER CODE END PFP */
@@ -115,18 +116,19 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC1_Init();
-  CAN_FIX_Initialize(0x460);
+  BSP_LED_Init(LED2);
+
+  CAN_FIX_Initialize(0x466);
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
 
   /* Initialize leds */
-  BSP_LED_Init(LED2);
+
 
   /* Initialize USER push-button, will be used to trigger an interrupt each time it's pressed.*/
   BSP_PB_Init(BUTTON_USER, BUTTON_MODE_EXTI);
-
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)

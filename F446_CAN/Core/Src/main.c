@@ -66,8 +66,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin == GPIO_PIN_13)
 	{
-		alarmData[0] = 10;
-		alarmData[1] = 20;
+		alarmData[0] = 244;
+		alarmData[1] = 10;
+		//alarmTriggered = 1;
 		CAN_FIX_SendHighPriortyNodeAlarm(1,alarmData, 2);
 	}
 }
@@ -76,7 +77,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 void CAN_FIX_HandleHighPriorityNodeAlarm(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData)
 {
     alarmData[0] = rxData[0];
-    alarmData[1] = rxData[0];
+    alarmData[1] = rxData[1];
     alarmTriggered = 1;
 }
 
@@ -112,7 +113,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_ADC1_Init();
-  CAN_FIX_Initialize(0x459);
+  CAN_FIX_Initialize(0x465);
 
   /* USER CODE END 2 */
 
