@@ -19,7 +19,7 @@ void Error_Handler();
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t RxData[8];
+uint8_t CanFixHwRxData[8];
 
 CAN_HandleTypeDef hcan1;
 
@@ -27,27 +27,29 @@ CAN_TxHeaderTypeDef TxHeader;
 CAN_RxHeaderTypeDef RxHeader;
 CAN_FIX_RxHeaderTypeDef CanFixRxHeader;
 
-uint8_t TxData[8];
+uint8_t CanFixHwTxData[8];
 uint32_t TxMailbox;
 uint32_t RxMailbox;
 
 void CanFixHw_SendMessage(CAN_FIX_TxHeaderTypeDef* header, uint8_t* txData)
 {
+	//TODO: Determine if the CAN_TxHeader is the same size as the CAN_FIX_TxHeaderTypeDef
+	// if it is, then simply do a memcpy on the header and separately on the data.
 	TxHeader.DLC = header->DLC;
 	TxHeader.ExtId = header->ExtId;
 	TxHeader.IDE = header->IDE;
 	TxHeader.RTR = header->RTR;
 	TxHeader.StdId = header->StdId;
 	TxHeader.TransmitGlobalTime = header->TransmitGlobalTime;
-	memcpy(TxData,txData,TxHeader.DLC);
-	HAL_CAN_AddTxMessage(&hcan1,&TxHeader, TxData, &TxMailbox);
+	memcpy(CanFixHwTxData,txData,TxHeader.DLC);
+	HAL_CAN_AddTxMessage(&hcan1,&TxHeader, CanFixHwTxData, &TxMailbox);
 }
 
 
 
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
-	HAL_CAN_GetRxMessage(&hcan1,CAN_RX_FIFO0,&RxHeader, RxData);
+	HAL_CAN_GetRxMessage(&hcan1,CAN_RX_FIFO0,&RxHeader, CanFixHwRxData);
 	CanFixRxHeader.DLC = RxHeader.DLC;
 	CanFixRxHeader.ExtId = RxHeader.ExtId;
 	CanFixRxHeader.FilterMatchIndex = RxHeader.FilterMatchIndex;
@@ -56,7 +58,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 	CanFixRxHeader.StdId = RxHeader.StdId;
 	CanFixRxHeader.Timestamp = RxHeader.Timestamp;
 
-	CAN_FIX_HandleCanRxMessage(&CanFixRxHeader, RxData);
+	CAN_FIX_HandleCanRxMessage(&CanFixRxHeader, CanFixHwRxData);
 }
 
 void CanFixHw_SetHardwareMask(uint16_t mask)
@@ -78,7 +80,7 @@ void CanFixHw_SetHardwareMask(uint16_t mask)
 }
 
 
-void CanFixHw_Initialize(uint32_t canId)
+void CanFixHw_Initialize()
 {
 	  /* USER CODE BEGIN CAN1_Init 0 */
 
@@ -113,10 +115,12 @@ void CanFixHw_Initialize(uint32_t canId)
 	  //Activate Notification
 	  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
 
-	  TxHeader.DLC = 2; // 2 data bytes
+
 	  TxHeader.IDE = CAN_ID_STD;
 	  TxHeader.RTR = CAN_RTR_DATA;
-	  TxHeader.StdId = canId; //Sender ID (this 446 device)
+	  //TODO: Remove this Every command must send a diffferent id and data length
+	  //TxHeader.DLC = 2; // 2 data bytes
+	  //TxHeader.StdId = nodeId; //Sender ID (this 446 device)
 }
 
 void CanFixHw_PeriodicCheck(void)

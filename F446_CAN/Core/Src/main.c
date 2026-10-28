@@ -59,25 +59,26 @@ static void MX_ADC1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint8_t alarmData[8];
+uint8_t RxData[8];
+uint8_t TxData[8];
 uint8_t alarmTriggered = 0;
 /* USER CODE BEGIN PFP */
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
 	if(GPIO_Pin == GPIO_PIN_13)
 	{
-		alarmData[0] = 244;
-		alarmData[1] = 10;
+		TxData[0] = 244;
+		TxData[1] = 10;
 		//alarmTriggered = 1;
-		CAN_FIX_SendHighPriortyNodeAlarm(1,alarmData, 2);
+		CAN_FIX_SendHighPriortyNodeAlarm(1,TxData, 2);
 	}
 }
 
 /* Define the default function with __weak attribute */
 void CAN_FIX_HandleHighPriorityNodeAlarm(CAN_FIX_RxHeaderTypeDef* rxHeader, uint8_t* rxData)
 {
-    alarmData[0] = rxData[0];
-    alarmData[1] = rxData[1];
+    RxData[0] = rxData[0];
+    RxData[1] = rxData[1];
     alarmTriggered = 1;
 }
 
@@ -129,10 +130,10 @@ int main(void)
   {
 	  if(alarmTriggered == 1)
 	  {
-		  for(int i = 0; i < alarmData[1]; i++)
+		  for(int i = 0; i < RxData[1]; i++)
 		  {
 			  BSP_LED_Toggle(LED2);
-			  HAL_Delay(alarmData[0]);
+			  HAL_Delay(RxData[0]);
 		  }
 		  alarmTriggered = 0;
 	  }

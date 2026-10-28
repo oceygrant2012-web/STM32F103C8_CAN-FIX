@@ -70,7 +70,7 @@ void CAN_FIX_PeriodicCheck(void);
 //TODO:  This will need to have correct parameters
 
 //Send the type of data to CAN
-void CAN_FIX_SendHighPriortyNodeAlarm(uint8_t alarm, uint8_t* alarmData, uint8_t alarmLength);
+void CAN_FIX_SendHighPriortyNodeAlarm(uint16_t alarm, uint8_t* alarmData, uint8_t alarmDataLength);
 //void CAN_FIX_SendNodeSpecificMessage();
 //void CAN_FIX_SendTwoWayCommunication(uint8_t channel, int8_t sender, uint8_t* data);
 
