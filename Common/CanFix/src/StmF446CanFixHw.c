@@ -128,3 +128,95 @@ void CanFixHw_PeriodicCheck(void)
 
 }
 
+/////////////////////  Conversion functions //////////////////////////////////////////////////////
+//These are declared with the Hardwre as the implementation is hardware dependent.
+//The bytes must be little-endien.  Depending on the microprocessor endienness,
+//The implementation may need to change.
+void ConvertInt16ToBytes(int16_t data, uint8_t* bytes)
+{
+	//Because Cortex-M is little-endien and
+	//they are being sent little-endien, memcpy works
+	//great!
+	memcpy(bytes,&data, sizeof(int16_t));
+}
+
+int16_t ConvertBytesToInt16(uint8_t* bytes)
+{
+	//Because Cortex-M is little-endien and
+	//they are being sent little-endien, memcpy works
+	//great!
+	int16_t integer;
+	memcpy(&integer,bytes, sizeof(int16_t));
+	return integer;
+}
+
+void ConvertUInt16ToBytes(uint16_t data, uint8_t* bytes)
+{
+	//Because Cortex-M is little-endien and
+	//they are being sent little-endien, memcpy works
+	//great!
+	memcpy(bytes,&data, sizeof(uint16_t));
+}
+
+uint16_t ConvertBytesToUint16(uint8_t* bytes)
+{
+	//Because Cortex-M is little-endien and
+	//they are being sent little-endien, memcpy works
+	//great!
+	uint16_t integer;
+	memcpy(&integer,bytes, sizeof(uint16_t));
+	return integer;
+}
+void ConvertInt32ToBytes(int32_t data, uint8_t* bytes)
+{
+	//Because Cortex-M is little-endien and
+	//they are being sent little-endien, memcpy works
+	//great!
+	memcpy(bytes,&data, sizeof(int32_t));
+}
+
+int32_t ConvertBytesToInt32(uint8_t* bytes)
+{
+	//Because Cortex-M is little-endien and
+	//they are being sent little-endien, memcpy works
+	//great!
+	int32_t integer;
+	memcpy(&integer,bytes, sizeof(int32_t));
+	return integer;
+}
+void ConvertUInt32ToBytes(uint32_t data, uint8_t* bytes)
+{
+	//Because Cortex-M is little-endien and
+	//they are being sent little-endien, memcpy works
+	//great!
+	memcpy(bytes,&data, sizeof(uint32_t));
+}
+
+uint32_t ConvertBytesToUint32(uint8_t* bytes)
+{
+	//Because Cortex-M is little-endien and
+	//they are being sent little-endien, memcpy works
+	//great!
+	uint32_t integer;
+	memcpy(&integer,bytes, sizeof(uint32_t));
+	return integer;
+}
+
+// float → 4 bytes
+void ConvertFloatToBytes(float data, uint8_t* bytes)
+{
+	//32-bit IEEE754
+	//Note:  STM32IDE float is IEEE-754
+	//Note:  Cortex M (STM32F446) is little-endien,
+	memcpy(bytes, &data, sizeof(float));
+}
+
+float ConvertBytesToFloat(uint8_t* bytes)
+{
+	//Because Cortex-M is little-endien and
+	//they are being sent little-endien, memcpy works
+	//great!
+	float f;
+	memcpy(&f,bytes, sizeof(float));
+	return f;
+}
